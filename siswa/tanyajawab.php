@@ -17,7 +17,7 @@ $nama_siswa = $siswa ? $siswa['nama'] : 'Siswa Tidak Dikenal';
 // Handle new question submission
 if (isset($_POST['ask_question'])) {
     $question = mysqli_real_escape_string($kon, $_POST['question']);
-    $insert_query = "INSERT INTO tanya_jawab (user_id, content, user_type) VALUES ('$nisn_siswa', '$question', 'siswa')";
+    $insert_query = "INSERT INTO tanya_jawab (nisn, content, user_type) VALUES ('$nisn_siswa', '$question', 'siswa')";
     if (mysqli_query($kon, $insert_query)) {
         echo '<script>alert("Pertanyaan berhasil diajukan!"); window.location="tanyajawab.php";</script>';
     } else {
@@ -26,9 +26,9 @@ if (isset($_POST['ask_question'])) {
 }
 
 // Fetch only the logged-in student's questions
-$fetch_query = "SELECT k.id, k.content, k.created_at, k.user_type, k.user_id as nisn
+$fetch_query = "SELECT k.id, k.content, k.created_at, k.user_type, k.nisn as nisn
                 FROM tanya_jawab k 
-                WHERE k.user_id = '$nisn_siswa' 
+                WHERE k.nisn = '$nisn_siswa' 
                 AND k.user_type = 'siswa'
                 AND k.parent_id IS NULL
                 ORDER BY k.created_at DESC";

@@ -20,42 +20,53 @@ $query = "
     SELECT 
         s.nisn, 
         s.nama, 
-        p.payment_type, 
         p.angsuran, 
-        SUM(p.jumlah_bayar) as total_bayar, 
-        spp.nominal 
+        SUM(p.jumlah_bayar) as total_bayar
     FROM 
         pembayaran p
-        JOIN siswa s ON p.nisn = s.nisn
-        JOIN spp ON s.id_spp = spp.id_spp
+        INNER JOIN siswa s ON p.nisn = s.nisn
     WHERE 
-        p.angsuran > 0";
+        p.angsuran IS NOT NULL 
+        AND p.angsuran != ''
+        AND p.angsuran != '0'";
 
 if ($filter_angsuran != '') {
-    $query .= " AND p.angsuran = $filter_angsuran";
+    $query .= " AND p.angsuran = '" . mysqli_real_escape_string($kon, $filter_angsuran) . "'";
 }
 
 $query .= "
-    GROUP BY 
-        s.nisn
-    ORDER BY 
-        s.nama ASC";
+    GROUP BY s.nisn, s.nama, p.angsuran 
+    ORDER BY s.nama ASC";
+
+$spp_query = "SELECT s.nisn, spp.nominal FROM siswa s LEFT JOIN spp ON s.id_spp = spp.id_spp";
+$spp_result = mysqli_query($kon, $spp_query);
+$spp_data = array();
+if($spp_result) {
+    while($spp_row = mysqli_fetch_assoc($spp_result)) {
+        $spp_data[$spp_row['nisn']] = $spp_row['nominal'] ? $spp_row['nominal'] : 0;
+    }
+}
 
 $result = mysqli_query($kon, $query);
 
 if (!$result) {
-    die("Query error: " . mysqli_error($kon));
+    echo '<script>alert("Query gagal: ' . mysqli_error($kon) . '");</script>';
+    die("Query Error: " . mysqli_error($kon));
 }
 
-// Debug: Tampilkan query untuk memeriksa
-// echo "<pre>Query: " . $query . "</pre>";
+$data_angsuran = array();
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data_angsuran[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>DATA ANGSURAN</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
 
@@ -71,7 +82,7 @@ if (!$result) {
     <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
     <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="../assets/vendor/quill.quill.bubble.css" rel="stylesheet">
     <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
@@ -103,59 +114,51 @@ if (!$result) {
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Daftar Siswa yang Melakukan Angsuran</h5>
+                            
                             <form method="get" class="mb-4">
                                 <label for="filter_angsuran" class="form-label">Filter Jenis Angsuran:</label>
                                 <select class="form-select" name="filter_angsuran" id="filter_angsuran" onchange="this.form.submit()">
                                     <option value="">Semua</option>
-                                    <option value="6" <?php echo $filter_angsuran == '6' ? 'selected' : ''; ?>>6x Angsuran</option>
-                                    <option value="12" <?php echo $filter_angsuran == '12' ? 'selected' : ''; ?>>12x Angsuran</option>
+                                    <option value="6" <?php echo $filter_angsuran == '6' ? 'selected' : ''; ?>>6x / Bulan</option>
+                                    <option value="12" <?php echo $filter_angsuran == '12' ? 'selected' : ''; ?>>12x / Bulan</option>
                                 </select>
                             </form>
                             
-                            <?php
-                            // Debug: Tampilkan jumlah baris hasil query
-                            $num_rows = mysqli_num_rows($result);
-                            // echo "<p>Jumlah data ditemukan: $num_rows</p>";
-                            ?>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>NISN</th>
-                                            <th>Nama Siswa</th>
-                                            <th>Jenis Angsuran</th>
-                                            <th>Total Bayar</th>
-                                            <th>Nominal SPP</th>
-                                            <th>Sisa Bayar</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if ($num_rows > 0): ?>
-                                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                                <?php 
-                                                    $sisa_bayar = $row['nominal'] - $row['total_bayar'];
-                                                    $status = ($sisa_bayar <= 0) ? '<span class="badge bg-success">Lunas</span>' : '<span class="badge bg-warning">Belum Lunas</span>';
-                                                ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($row['nisn']); ?></td>
-                                                    <td><?php echo htmlspecialchars($row['nama']); ?></td>
-                                                    <td><?php echo $row['angsuran'] . 'x'; ?></td>
-                                                    <td>Rp <?php echo number_format($row['total_bayar'], 0, ',', '.'); ?></td>
-                                                    <td>Rp <?php echo number_format($row['nominal'], 0, ',', '.'); ?></td>
-                                                    <td>Rp <?php echo number_format($sisa_bayar, 0, ',', '.'); ?></td>
-                                                    <td><?php echo $status; ?></td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        <?php else: ?>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>NISN</th>
+                                        <th>Nama Siswa</th>
+                                        <th>Jenis Angsuran</th>
+                                        <th>Total Bayar</th>
+                                        <th>Sisa Bayar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($data_angsuran) > 0): ?>
+                                        <?php foreach ($data_angsuran as $row): ?>
+                                            <?php 
+                                                $nominal_spp = isset($spp_data[$row['nisn']]) ? $spp_data[$row['nisn']] : 0;
+                                                $sisa_bayar = $nominal_spp - $row['total_bayar'];
+                                            ?>
                                             <tr>
-                                                <td colspan="7" class="text-center">Tidak ada data angsuran siswa yang ditemukan.</td>
+                                                <td><?php echo htmlspecialchars($row['nisn']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['nama']); ?></td>
+                                                <td><?php echo $row['angsuran'] . 'x'; ?></td>
+                                                <td>Rp<?php echo number_format($row['total_bayar'], 0, ',', '.'); ?>,-</td>
+                                                <td>Rp<?php echo number_format($sisa_bayar, 0, ',', '.'); ?>,-</td>
                                             </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                Tidak ada data angsuran siswa yang ditemukan.
+                                                <br><small>Pastikan ada data pembayaran dengan kolom angsuran yang terisi.</small>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

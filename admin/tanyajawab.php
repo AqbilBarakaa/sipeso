@@ -8,7 +8,7 @@ if (!isset($_SESSION["admin"])) {
     exit;
 }
 
-$user_id = $_SESSION['admin'];
+$nisn = $_SESSION['admin'];
 
 // Aktifkan error reporting
 error_reporting(E_ALL);
@@ -17,7 +17,7 @@ ini_set('display_errors', 1);
 // Fetch questions
 $fetch_query = "SELECT k.id, k.content, k.created_at, s.nama 
                 FROM tanya_jawab k 
-                JOIN siswa s ON k.user_id = s.nisn
+                JOIN siswa s ON k.nisn = s.nisn
                 WHERE k.parent_id IS NULL
                 ORDER BY k.created_at DESC";
 

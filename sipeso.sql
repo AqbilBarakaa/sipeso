@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 29, 2025 at 08:14 PM
+-- Generation Time: Jun 08, 2025 at 12:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,7 +39,12 @@ CREATE TABLE `beasiswa` (
 
 INSERT INTO `beasiswa` (`id`, `judul`, `deskripsi`) VALUES
 (1, 'Beasiswa Jalur Prestasi', 'Untuk siswa yang berpestrasi'),
-(2, 'Beasiswa Kurang Mampu', 'Untuk siswa yang kurang mampu');
+(2, 'Beasiswa Kurang Mampu', 'Untuk siswa yang kurang mampu'),
+(4, '', ''),
+(5, '', ''),
+(6, '', ''),
+(7, '', ''),
+(8, '', '');
 
 -- --------------------------------------------------------
 
@@ -59,7 +64,8 @@ CREATE TABLE `code_beasiswa` (
 --
 
 INSERT INTO `code_beasiswa` (`id`, `code`, `discount_amount`, `used`) VALUES
-(1, 'JWEBN', 100000.00, 0);
+(1, 'JWEBN', 100000.00, 1),
+(2, 'BWMTL', 100000.00, 0);
 
 -- --------------------------------------------------------
 
@@ -94,7 +100,6 @@ CREATE TABLE `notifikasi` (
   `id_notifikasi` int(11) NOT NULL,
   `nisn` varchar(20) NOT NULL,
   `id_petugas` int(11) NOT NULL,
-  `id_pembayaran` int(11) DEFAULT NULL,
   `judul` varchar(255) NOT NULL,
   `pesan` text NOT NULL,
   `status` enum('terkirim','dibaca') DEFAULT 'terkirim',
@@ -106,15 +111,8 @@ CREATE TABLE `notifikasi` (
 -- Dumping data for table `notifikasi`
 --
 
-INSERT INTO `notifikasi` (`id_notifikasi`, `nisn`, `id_petugas`, `id_pembayaran`, `judul`, `pesan`, `status`, `tanggal_kirim`, `keterangan`) VALUES
-(11, '2651590352', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:08:16', 'Belum pernah membayar SPP sama sekali'),
-(14, '8938461948', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:10:53', 'Belum pernah membayar SPP sama sekali'),
-(15, '9233330354', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:22:20', 'Belum pernah membayar SPP sama sekali'),
-(16, '2651590352', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:31:25', 'Belum pernah membayar SPP sama sekali'),
-(17, '2651590352', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:31:27', 'Belum pernah membayar SPP sama sekali'),
-(18, '9233330354', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:40:46', 'Belum pernah membayar SPP sama sekali'),
-(19, '8938461948', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:40:48', 'Belum pernah membayar SPP sama sekali'),
-(20, '8938461948', 2, NULL, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum pernah membayar SPP sama sekali', 'dibaca', '2025-05-29 19:46:17', 'Belum pernah membayar SPP sama sekali');
+INSERT INTO `notifikasi` (`id_notifikasi`, `nisn`, `id_petugas`, `judul`, `pesan`, `status`, `tanggal_kirim`, `keterangan`) VALUES
+(24, '8938461948', 2, 'Tunggakan SPP', 'Anda memiliki tunggakan SPP. Belum Membayar sejak bulan January ', 'dibaca', '2025-06-08 09:52:07', 'Belum Membayar sejak bulan January ');
 
 -- --------------------------------------------------------
 
@@ -132,7 +130,7 @@ CREATE TABLE `pembayaran` (
   `id_spp` int(11) NOT NULL,
   `jumlah_bayar` int(11) NOT NULL,
   `angsuran` int(11) DEFAULT NULL,
-  `status` enum('paid','unpaid') NOT NULL DEFAULT 'unpaid',
+  `status` enum('paid','unpaid') NOT NULL DEFAULT 'paid',
   `payment_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -141,7 +139,16 @@ CREATE TABLE `pembayaran` (
 --
 
 INSERT INTO `pembayaran` (`id_pembayaran`, `id_petugas`, `nisn`, `tgl_bayar`, `bulan_dibayar`, `tahun_dibayar`, `id_spp`, `jumlah_bayar`, `angsuran`, `status`, `payment_type`) VALUES
-(1, 2, '3651355998', 29, '05', '2025', 0, 600000, 0, 'unpaid', 'bulanan');
+(2, 2, '3651355998', 8, '06', '2025', 0, 700000, 0, 'paid', 'bulanan'),
+(3, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'paid', 'bulanan'),
+(4, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'unpaid', 'bulanan'),
+(5, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'unpaid', 'bulanan'),
+(6, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'unpaid', 'bulanan'),
+(7, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'unpaid', 'bulanan'),
+(8, 2, '9233330354', 8, '06', '2025', 0, 116667, 6, 'unpaid', 'bulanan'),
+(9, 2, '2651590352', 8, '06', '2025', 0, 58333, 12, 'unpaid', 'bulanan'),
+(10, 2, '2651590352', 8, '06', '2025', 0, 58333, 12, 'unpaid', 'bulanan'),
+(11, 2, '2651590352', 8, '06', '2025', 0, 58333, 12, 'unpaid', 'bulanan');
 
 -- --------------------------------------------------------
 
@@ -162,7 +169,7 @@ CREATE TABLE `pengajuan_keringanan` (
 --
 
 INSERT INTO `pengajuan_keringanan` (`id`, `nis`, `alasan`, `status`, `created_at`) VALUES
-(1, 'Rypaldho', 'Saya ingin mengajukan Keringanan', 'pending', '2025-05-26 02:49:00');
+(4, '3651355998', 'Saya ingin mengajukan keringanan. Dikarenakan, orang tua saya telah diPHK', 'pending', '2025-06-08 07:49:57');
 
 -- --------------------------------------------------------
 
@@ -235,8 +242,8 @@ CREATE TABLE `spp` (
 --
 
 INSERT INTO `spp` (`id_spp`, `tahun_ajaran`, `nominal`) VALUES
-(1, 2023, 600000),
-(2, 2024, 650000),
+(1, 2023, 700000),
+(2, 2024, 700000),
 (3, 2025, 700000);
 
 -- --------------------------------------------------------
@@ -247,7 +254,7 @@ INSERT INTO `spp` (`id_spp`, `tahun_ajaran`, `nominal`) VALUES
 
 CREATE TABLE `tanya_jawab` (
   `id` int(11) NOT NULL,
-  `user_id` varchar(255) NOT NULL,
+  `nisn` varchar(255) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
   `content` text NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
@@ -258,11 +265,10 @@ CREATE TABLE `tanya_jawab` (
 -- Dumping data for table `tanya_jawab`
 --
 
-INSERT INTO `tanya_jawab` (`id`, `user_id`, `parent_id`, `content`, `created_at`, `user_type`) VALUES
-(1, 'Ridotua', NULL, 'Permisi pak, saya ingin bertanya\r\n', '2025-05-29 08:25:14', 'siswa'),
-(2, 'Ridotua', 1, 'Ya, kenapa?', '2025-05-29 08:26:16', 'admin'),
-(3, 'Ridotua', 1, 'Gajadi pak', '2025-05-29 08:26:27', 'siswa'),
-(4, 'Ridotua', 1, 'Apalah', '2025-05-29 08:26:41', 'admin');
+INSERT INTO `tanya_jawab` (`id`, `nisn`, `parent_id`, `content`, `created_at`, `user_type`) VALUES
+(13, '3651355998', NULL, 'Saya ingin bertanya pak', '2025-06-08 07:48:51', 'siswa'),
+(18, '3651355998', 13, 'Iya, ada apa?', '2025-06-08 08:42:14', 'admin'),
+(19, '3651355998', 13, 'Tidak jadi.', '2025-06-08 08:42:25', 'siswa');
 
 --
 -- Indexes for dumped tables
@@ -293,8 +299,7 @@ ALTER TABLE `kelas`
 ALTER TABLE `notifikasi`
   ADD PRIMARY KEY (`id_notifikasi`),
   ADD KEY `nisn` (`nisn`),
-  ADD KEY `id_petugas` (`id_petugas`),
-  ADD KEY `id_pembayaran` (`id_pembayaran`);
+  ADD KEY `id_petugas` (`id_petugas`);
 
 --
 -- Indexes for table `pembayaran`
@@ -343,13 +348,13 @@ ALTER TABLE `tanya_jawab`
 -- AUTO_INCREMENT for table `beasiswa`
 --
 ALTER TABLE `beasiswa`
-  MODIFY `id` int(64) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(64) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `code_beasiswa`
 --
 ALTER TABLE `code_beasiswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `kelas`
@@ -361,19 +366,19 @@ ALTER TABLE `kelas`
 -- AUTO_INCREMENT for table `notifikasi`
 --
 ALTER TABLE `notifikasi`
-  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `pembayaran`
 --
 ALTER TABLE `pembayaran`
-  MODIFY `id_pembayaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_pembayaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `pengajuan_keringanan`
 --
 ALTER TABLE `pengajuan_keringanan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `petugas`
@@ -391,7 +396,7 @@ ALTER TABLE `spp`
 -- AUTO_INCREMENT for table `tanya_jawab`
 --
 ALTER TABLE `tanya_jawab`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables
@@ -402,8 +407,7 @@ ALTER TABLE `tanya_jawab`
 --
 ALTER TABLE `notifikasi`
   ADD CONSTRAINT `notifikasi_ibfk_1` FOREIGN KEY (`nisn`) REFERENCES `siswa` (`nisn`),
-  ADD CONSTRAINT `notifikasi_ibfk_2` FOREIGN KEY (`id_petugas`) REFERENCES `petugas` (`id_petugas`),
-  ADD CONSTRAINT `notifikasi_ibfk_3` FOREIGN KEY (`id_pembayaran`) REFERENCES `pembayaran` (`id_pembayaran`);
+  ADD CONSTRAINT `notifikasi_ibfk_2` FOREIGN KEY (`id_petugas`) REFERENCES `petugas` (`id_petugas`);
 
 --
 -- Constraints for table `pembayaran`
